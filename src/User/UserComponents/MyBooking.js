@@ -14,7 +14,8 @@ function MyBooking() {
   const [show, setShow] = useState(false);
   const [bookCenterById, setbookCenterById] = useState(null);
   const location = useLocation();
-  const [state, setState] = useState(location.state);
+  const [deleteId, setDeleteId] = useState("");
+  const [load, setLoad] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     axios
@@ -26,19 +27,19 @@ function MyBooking() {
         // console.log(state);
         console.log("good");
       });
-  }, []);
-  const handleUpdate = (book) => {
-    navigate("/EditBooking", { state: book });
+  }, [load]);
+  const handleUpdate = (book, ID) => {
+    navigate(`/EditBooking?id=${book.id}`, { state: book });
   };
   const handleClose = () => {
     setShow(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (deleteId) => {
     axios
-      .delete(`http://localhost:8080/${bookCenterById}`)
+      .delete(`http://localhost:8080/deleteProducts/${deleteId}`)
       .then((data) => {
-        navigate("/MyBooking");
+        setLoad(!load);
         setShow(false);
         console.log(data);
       })
@@ -76,14 +77,14 @@ function MyBooking() {
                       <td>
                         <PencilSquare
                           onClick={() => {
-                            handleUpdate();
+                            handleUpdate(value, value.id);
                           }}
                         ></PencilSquare>
                       </td>
                       <td>
                         <Trash
                           onClick={() => {
-                            // setbookCenterById(book.id);
+                            setDeleteId(value.id);
                             setShow(true);
                           }}
                         />
@@ -100,7 +101,7 @@ function MyBooking() {
               <Button variant="secondary" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={handleDelete}>
+              <Button variant="primary" onClick={() => handleDelete(deleteId)}>
                 Confrim
               </Button>
             </Modal.Footer>
